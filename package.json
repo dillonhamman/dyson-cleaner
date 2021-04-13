@@ -1,0 +1,19 @@
+{
+  "name": "dyson-cleaner",
+  "version": "1.0.0",
+  "description": "Migration cleaner",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillonhamman/dyson-cleaner.git"
+  },
+  "author": "Dillon Hamman <dillonhamman@email.arizona.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dillonhamman/dyson-cleaner/issues"
+  },
+  "homepage": "https://github.com/dillonhamman/dyson-cleaner#readme"
+}
