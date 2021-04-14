@@ -1,25 +1,23 @@
-const { Pool } = require('pg')
-//'postgresql://old:hehehe@localhost:5432/old'
+const { Pool } = require('pg');
+
 
 module.exports = {
-    setRec: function(records){
-        recordsArr = records;
-        return recordsArr;
-    },
-    startConnections: function(oldString, newString){
+    startConnections: async function(oldString, newString){
         const oldPool = new Pool({
             connectionString: oldString,
         })
         const newPool = new Pool({
             connectionString: newString,
         })
-        oldPool.query('SELECT * FROM accounts', (err, res) => {
-            if (err) throw err;
-            console.log(res);
-        })
-        newPool.query('SELECT * FROM accounts', (err, res) => {
-            if (err) throw err;
-            console.log(res);
-        });
-    }
+        var oldDB = await oldPool.query('SELECT * FROM accounts', []);
+        var newDB = await newPool.query('SELECT * FROM accounts', []);
+        return (compareDBs(oldDB, newDB));
+    },  
 }
+
+
+function compareDBs(oldDB, newDB) {
+    console.log(oldDB == newDB);
+}
+
+
