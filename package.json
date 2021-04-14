@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Migration cleaner",
   "main": "index.js",
+  "engines": {
+    "node": "7.10.0"
+  },
   "scripts": {
+    "start": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -12,6 +16,11 @@
   },
   "author": "Dillon Hamman <dillonhamman@email.arizona.edu>",
   "license": "MIT",
+  "dependencies": {
+    "express": "4.17.1",
+    "pg": "8.6.0",
+    "prompt": "^1.1.0"
+  },
   "bugs": {
     "url": "https://github.com/dillonhamman/dyson-cleaner/issues"
   },
