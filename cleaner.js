@@ -17,19 +17,23 @@ module.exports = {
 
 
 function compareDBs(oldDB, newDB) {
-    compareSizes(oldDB, newDB);
-    
+    compareSizes(oldDB, newDB); 
 }
 
 function compareSizes(oldDB, newDB){
-    if (oldDB.rows == newDB.rows){
-        return console.log("No accounts were lost in the migration.");
-    } else if (oldDB.rows > newDB.rows){
-        return console.log("Accounts were lost in the migration.");
+    if (oldDB.rowCount == newDB.rowCount){
+        return console.log("No accounts were lost in the migration.\n");
+    } else if (oldDB.rowCount > newDB.rowCount){
+        console.log(oldDB.rowCount, newDB.rowCount);
+        return console.log((oldDB.rowCount - newDB.rowCount),
+                'account(s) were missed in the migration.');
         // TODO: find missing record
     } else {
-        return console.log("Accounts were created during the migration");
+        return console.log("Accounts were created during the migration.\n");
     }
+}
+
+function findMissingRecords(oldDB, newDB){
 
 }
 
