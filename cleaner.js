@@ -7,7 +7,6 @@
  */
 const { Pool } = require('pg');
 
-
 module.exports = {
     /**
      * This async function creates the connections and then
@@ -26,9 +25,24 @@ module.exports = {
         // store database contents in arrays 
         var oldDB = await oldPool.query('SELECT * FROM public.accounts', []);
         var newDB = await newPool.query('SELECT * FROM public.accounts', []);
+        compareFields(oldDB, newDB);
         compareSizes(oldDB, newDB);
     },  
 }
+/**
+ * This method compares the length of the fields in the two 
+ * databases and outputs the difference to the user.
+ * @param {array} oldDB 
+ * @param {array} newDB 
+ */
+function compareFields(oldDB, newDB){
+    if (newDB.fields.length > oldDB.fields.length){
+        var dif = newDB.fields.length - oldDB.fields.length;
+        console.log('Post-migration contains:', dif, 'new field(s)\n');
+    }
+}
+
+
 /**
  * This method traverses over the two arrays of objects 
  * and checks to seeif each object from the oldDB is in 
@@ -37,8 +51,7 @@ module.exports = {
  * @param {array} newDB 
  */
 function findMissing(oldDB, newDB){
-
-    
+    //TODO: find missing 
 }
 
 /**
@@ -60,7 +73,7 @@ function compareSizes(oldDB, newDB){
         console.log('pre-', oldDB.rowCount, 'post-', newDB.rowCount , "\n");
         console.log((oldDB.rowCount - newDB.rowCount),
                 'account(s) were missed in the migration.');
-                findMissing(oldDB, newDB);
+                //findMissing(oldDB, newDB);
     } else {
         // newDB is greater than oldDB
         return console.log("Accounts were created during the migration.\n\n\n\n");
