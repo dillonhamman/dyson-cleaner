@@ -10,3 +10,11 @@ $ node --version
 v12.18.3
 ```
 
+## Scripts
+
+Once the repository is cloned, change into the directory and run 
+```
+npm start
+```
+You will then be prompted for the two Databases.
+
