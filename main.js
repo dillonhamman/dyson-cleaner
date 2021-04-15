@@ -17,15 +17,17 @@ const clean = require('./cleaner');
 
 // Start promt and address user
 prompt.start();
-console.log("Welcome \n Please enter the names of the database connection strings \
+console.log("Welcome! \n Please enter the names of the database connection strings \
 from the pre and post migration.\n\n");
 
 // Take the input and send it to the startConnections method in cleaner.js
 prompt.get(['oldConnectionString', 'newConnectionString'], function (err, result){
     if (err) {return onErr(err)}
-    console.log('Connection strings recieved!');
-    clean.startConnections(result.oldConnectionString = 'postgresql://old:hehehe@localhost:5432/old'
-                        , result.newConnectionString =  'postgresql://new:hahaha@localhost:5433/new');   
+    console.log('Connection strings recieved!\n');
+    clean.startCleaning(result.oldConnectionString = 
+                            'postgresql://old:hehehe@localhost:5432/old'
+                            ,result.newConnectionString =  
+                            'postgresql://new:hahaha@localhost:5433/new');   
 });
 // Error handeling could be in place for making sure the user inputs a 
 // correct postgres formatted connectionString but since it is assumed 
