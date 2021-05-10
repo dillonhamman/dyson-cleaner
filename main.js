@@ -18,7 +18,7 @@ const clean = require('./cleaner');
 
 // Start promt and address user
 prompt.start();
-console.log("Welcome! \n Please enter the names of the database connection strings \
+console.log("Welcome! \n Please enter the database connection strings \
 from the pre and post migration.\n\n");
 
 // Take the input and send it to the startConnections method in cleaner.js

@@ -18,7 +18,7 @@ module.exports = {
      * @param {string} newString  - postmiigration connectionString
      */
     startCleaning: async function(oldString, newString){
-        console.log("\n\n\n Inspecting... \n\n");
+        console.log("\n Starting Inspection \n\n");
         
         const oldPool = new Pool({
             connectionString: oldString,
@@ -76,39 +76,48 @@ module.exports = {
             return false;
         }
         
+        // Create Accounts
         let oldAccounts = new Accounts();
         let newAccounts = new Accounts();
 
+        // Add DB records to Accounts objects.
        for (let row of oldDB.rows){
             oldAccounts.push(new Account(row.id, row.name, row.email));
         }
         for (let row of newDB.rows){
             newAccounts.push(new Account(row.id, row.name, row.email));
         }
-        console.log("Finding Missing Accounts \n");
-        missing = findMissing(oldAccounts, newAccounts);  
-        console.log("Finding Created Accounts \n");
-        created = findCreated(oldAccounts, newAccounts);
-        console.log("Finding Corrupted Accounts \n");
+
+        // This block of code walks the user through what the 
+        // program is doing and then outputs the findings.
+
+        console.log("Finding Missing Accounts... \n");
+        //missing = findMissing(oldAccounts, newAccounts);  
+        console.log("Finding Created Accounts... \n");
+       // created = findCreated(oldAccounts, newAccounts);
+        console.log("Finding Corrupted Accounts... \n");
         corrupted = findCorrupted(oldAccounts, newAccounts);
         console.log("Missing accounts: \n");
-        console.log(missing);
+      //  console.log(missing);
         console.log("\n Created accounts: \n")
-        console.log(created);
+      //  console.log(created);
         console.log("\n Corrupted accounts: \n");
-        console.log(corrupted); 
+        for (let corr of corrupted){
+            console.log(corr);
+        }
         
     },  
 }
 
 /**
- * This method traverses over the two arrays of objects 
+ * This function traverses over the two arrays of objects 
  * and checks to see if each object from the oldDB is in 
  * the newDB. If an original object is not in the new DB
- * it is considered missing. 
+ * it is considered missing.  
  * 
  * Since there are no duplicate IDs, if a ID exist in the 
  * old DB but not the new, it is recorded as missing. 
+ * This funciton assumes neither of the DBs are empty.
  * @param {Accounts} oldDB 
  * @param {Accounts} newDB 
  */
@@ -122,7 +131,7 @@ function findMissing(oldAccounts, newAccounts){
     return missing;
 }
 
-// This method is identical to the find method
+// This function is identical to the find method
 // but for readability is used.
 function findCreated(oldAccounts, newAccounts){
     const created = [];
@@ -142,12 +151,12 @@ function findCreated(oldAccounts, newAccounts){
  * 
  * This function returns a 2D array of objects, mapped to 
  * the change that happened in the migration. 
- * 
+ * This funciton assumes neither of the DBs are empty.
  * @param {Accounts} oldDB 
  * @param {Accounts} newDB 
 */
 function findCorrupted(oldAccounts, newAccounts){
-    const corrupted = []
+    const corrupted = [];
     for (let pre of oldAccounts.accounts){
         for (let post of newAccounts.accounts){
             if (pre.id === post.id){
