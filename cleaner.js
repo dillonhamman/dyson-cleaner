@@ -91,13 +91,13 @@ module.exports = {
         // This block of code walks the user through what the 
         // program is doing and then outputs the findings.
 
-        console.log("Finding Missing Accounts... \n");
+        console.log("Finding Missing Accounts... ");
         missing = findMissing(oldAccounts, newAccounts);  
-        console.log("Done. \n Finding Created Accounts... \n");
+        console.log("Done. \n\n Finding Created Accounts... ");
         created = findCreated(oldAccounts, newAccounts);
-        console.log("Done. \n Finding Corrupted Accounts... \n");
+        console.log("Done. \n\n Finding Corrupted Accounts... ");
         corrupted = findCorrupted(oldAccounts, newAccounts);
-        console.log("Done. \n Missing accounts: \n");
+        console.log("Done. \n\n Missing accounts: \n");
         console.log(missing);
         console.log("\n Created accounts: \n")
         console.log(created);
