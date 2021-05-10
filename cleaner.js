@@ -92,19 +92,18 @@ module.exports = {
         // program is doing and then outputs the findings.
 
         console.log("Finding Missing Accounts... \n");
-        //missing = findMissing(oldAccounts, newAccounts);  
-        console.log("Finding Created Accounts... \n");
-       // created = findCreated(oldAccounts, newAccounts);
-        console.log("Finding Corrupted Accounts... \n");
+        missing = findMissing(oldAccounts, newAccounts);  
+        console.log("Done. \n Finding Created Accounts... \n");
+        created = findCreated(oldAccounts, newAccounts);
+        console.log("Done. \n Finding Corrupted Accounts... \n");
         corrupted = findCorrupted(oldAccounts, newAccounts);
-        console.log("Missing accounts: \n");
-      //  console.log(missing);
+        console.log("Done. \n Missing accounts: \n");
+        console.log(missing);
         console.log("\n Created accounts: \n")
-      //  console.log(created);
+        console.log(created);
         console.log("\n Corrupted accounts: \n");
-        for (let corr of corrupted){
-            console.log(corr);
-        }
+        console.log(corrupted);
+    
         
     },  
 }
@@ -149,9 +148,17 @@ function findCreated(oldAccounts, newAccounts){
  * This would indicate that the record has been corrupted
  * in the migration.
  * 
- * This function returns a 2D array of objects, mapped to 
+ * This function returns a 2D array of objects, which
+ * is the record ID followed by 
  * the change that happened in the migration. 
  * This funciton assumes neither of the DBs are empty.
+ * 
+ * Example: 
+ *            ID  "Pre"     "Post"
+ * output -> [1, "Thomas", "Steven"] indicates 
+ * that entity with ID: 1 , originally had the name Thomas 
+ * and is now has the name Steven. It also will show 
+ * corrupt email entities.
  * @param {Accounts} oldDB 
  * @param {Accounts} newDB 
 */
@@ -169,4 +176,5 @@ function findCorrupted(oldAccounts, newAccounts){
             }
         }
     }
+    return corrupted;
 }
