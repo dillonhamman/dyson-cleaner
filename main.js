@@ -9,7 +9,8 @@
  * 
  * After recieving the user input using a prompt, the arguments given
  * are sent to the "cleaner" methods where they will connect to the database
- * and tested upon. 
+ * and tested upon. The information (missing accounts, created accounts and 
+ * corrupted) are then outputted to the user.
  * 
  */
 
@@ -25,8 +26,8 @@ from the pre and post migration.\n\n");
 prompt.get(['oldConnectionString', 'newConnectionString'], function (err, result){
     if (err) {return onErr(err)}
     console.log('\nConnection strings recieved!\n');
-    clean.startCleaning(result.oldConnectionString = 'postgresql://old:hehehe@localhost:5432/old',
-                            result.newConnectionString = 'postgresql://new:hahaha@localhost:5433/new');   
+    clean.startCleaning(result.oldConnectionString,
+                            result.newConnectionString);   
 });
 // Error handeling could be in place for making sure the user inputs a 
 // correct postgres formatted connectionString but since it is assumed 
