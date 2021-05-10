@@ -18,7 +18,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
-    "pg": "8.6.0",
+    "pg": "^8.6.0",
+    "pg-cursor": "^2.6.0",
     "prompt": "^1.1.0"
   },
   "bugs": {

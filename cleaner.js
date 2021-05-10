@@ -10,78 +10,154 @@ const { Pool } = require('pg');
 module.exports = {
     /**
      * This async function creates the connections and then
-     * uses a basic query to get two arrays of objects. 
+     * uses a basic query to get two arrays of objects. The 
+     * account objects as well as the object created to store 
+     * them are also defined in this method. 
      * 
      * @param {string} oldString  - premigration connectionString
      * @param {string} newString  - postmiigration connectionString
      */
     startCleaning: async function(oldString, newString){
+        console.log("\n\n\n Inspecting... \n\n");
+        
         const oldPool = new Pool({
             connectionString: oldString,
         })
         const newPool = new Pool({
             connectionString: newString,
         })
+
         // store database contents in arrays 
-        var oldDB = await oldPool.query('SELECT * FROM public.accounts', []);
-        var newDB = await newPool.query('SELECT * FROM public.accounts', []);
-        compareFields(oldDB, newDB);
-        compareSizes(oldDB, newDB);
+        const oldDB = await oldPool.query('SELECT * FROM public.accounts');
+        const newDB = await newPool.query('SELECT * FROM public.accounts');
+
+        // Create an object to store an array of accounts
+        let Accounts = class {
+            constructor(){
+                this.accounts = [];
+            }
+            push = function(o){
+                this.accounts.push(o);
+            } 
+            get = function(index){
+                return this.accounts[index];
+            }
+        }
+
+        Accounts.prototype.toString = function () {
+            console.log(this.accounts);
+        }
+
+        Accounts.prototype.includes = function (o) {
+            for (let curr of this.accounts){
+                if (curr.id === o.id){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Object for an account, to append into the Accounts object
+        let Account = class {
+            constructor(id, name, email){
+                this.id = id;
+                this.name = name;
+                this.email = email;
+            }
+        }
+        Account.prototype.equals = function (o) {
+            if (this.id === o.id){
+                if (this.name === o.name){
+                    if (this.email === o.email){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        let oldAccounts = new Accounts();
+        let newAccounts = new Accounts();
+
+       for (let row of oldDB.rows){
+            oldAccounts.push(new Account(row.id, row.name, row.email));
+        }
+        for (let row of newDB.rows){
+            newAccounts.push(new Account(row.id, row.name, row.email));
+        }
+        console.log("Finding Missing Accounts \n");
+        missing = findMissing(oldAccounts, newAccounts);  
+        console.log("Finding Created Accounts \n");
+        created = findCreated(oldAccounts, newAccounts);
+        console.log("Finding Corrupted Accounts \n");
+        corrupted = findCorrupted(oldAccounts, newAccounts);
+        console.log("Missing accounts: \n");
+        console.log(missing);
+        console.log("\n Created accounts: \n")
+        console.log(created);
+        console.log("\n Corrupted accounts: \n");
+        console.log(corrupted); 
+        
     },  
 }
-/**
- * This method compares the length of the fields in the two 
- * databases and outputs the difference to the user.
- * @param {array} oldDB 
- * @param {array} newDB 
- */
-function compareFields(oldDB, newDB){
-    if (newDB.fields.length > oldDB.fields.length){
-        var dif = newDB.fields.length - oldDB.fields.length;
-        console.log('Post-migration contains:', dif, 'new field(s)\n');
-    }
-}
-
 
 /**
  * This method traverses over the two arrays of objects 
- * and checks to seeif each object from the oldDB is in 
- * the newDB. 
- * @param {array} oldDB 
- * @param {array} newDB 
+ * and checks to see if each object from the oldDB is in 
+ * the newDB. If an original object is not in the new DB
+ * it is considered missing. 
+ * 
+ * Since there are no duplicate IDs, if a ID exist in the 
+ * old DB but not the new, it is recorded as missing. 
+ * @param {Accounts} oldDB 
+ * @param {Accounts} newDB 
  */
-function findMissing(oldDB, newDB){
-    //TODO: find missing 
+function findMissing(oldAccounts, newAccounts){
+    const missing = [];
+    for (let find of oldAccounts.accounts){
+        if (!newAccounts.includes(find)){
+            missing.push(find);
+        }
+    }  
+    return missing;
 }
 
-/**
- * This funciton takes in two database instances [list of objects]
- * and compares the sizes of them. 
+// This method is identical to the find method
+// but for readability is used.
+function findCreated(oldAccounts, newAccounts){
+    const created = [];
+    for (let find of newAccounts.accounts){
+        if (!oldAccounts.includes(find)){
+            created.push(find);
+        }
+    }
+    return created;
+}
+
+/** 
+ * This funciton iterates over the two databases and finds
+ * records that have matching IDs, but unidentical data.
+ * This would indicate that the record has been corrupted
+ * in the migration.
  * 
- * @oldDB - the premigration database
- * @newDB - the postmigration database
+ * This function returns a 2D array of objects, mapped to 
+ * the change that happened in the migration. 
  * 
- * @return a console log explainging the comparison,
- *              also if necessary, a call to another funciton
- */
-function compareSizes(oldDB, newDB){
-    // Check if they are the same size 
-    if (oldDB.rowCount == newDB.rowCount){
-        return console.log("No accounts were lost in the migration.\n");
-        // Check if oldDB is greater than newDB
-    } else if (oldDB.rowCount > newDB.rowCount){
-        console.log('pre-', oldDB.rowCount, 'post-', newDB.rowCount , "\n");
-        console.log((oldDB.rowCount - newDB.rowCount),
-                'account(s) were missed in the migration.');
-                //findMissing(oldDB, newDB);
-    } else {
-        // newDB is greater than oldDB
-        return console.log("Accounts were created during the migration.\n\n\n\n");
+ * @param {Accounts} oldDB 
+ * @param {Accounts} newDB 
+*/
+function findCorrupted(oldAccounts, newAccounts){
+    const corrupted = []
+    for (let pre of oldAccounts.accounts){
+        for (let post of newAccounts.accounts){
+            if (pre.id === post.id){
+                if (pre.name != post.name){
+                    corrupted.push([pre.id, pre.name, post.name]);
+                }
+                if (pre.email != post.email){
+                    corrupted.push([pre.id, pre.email, post.email]);
+                }
+            }
+        }
     }
 }
-
-
-
-
-
-
